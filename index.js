@@ -27,11 +27,29 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true } , function (err, db) {
     app.post('/api/register', function (request, response) {
 
         if (!request.body) {
-            response.status(400).send("Please send user information'");
+            response.status(400).send("Please send user information!");
         }
         else {
-            var userInfo = request.body;
+            let userInfo = request.body;
             userClass.Register(dbo, userInfo, function (err, result) {
+                if (err) {
+                    response.status(500).send(result);
+                }
+                else {
+                    response.status(201).send(result);
+                }
+            })
+        }
+    });
+
+    app.post('/api/login',function(request, response){
+        if (!request.body) {
+            response.status(400).send("Please send user information!");
+        }
+        else {
+            let userInfo = request.body;
+
+            userClass.Login(dbo, userInfo, function (err, result) {
                 if (err) {
                     response.status(500).send(result);
                 }

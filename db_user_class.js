@@ -36,6 +36,30 @@ module.exports.Register = function (db, UserInfo, callback) {
     });
 };
 
+module.exports.Login= function(db, UserInfo, callback){
+    let result = new ResultInfo(false, null, '');
+
+    db.collection(tableName).findOne({username : UserInfo.username, password : UserInfo.password},function(err, res){
+        if(err){
+            result.setMessage('Query error!');
+            callback(err, result);
+        }
+        else{
+            if (res != '' && res != null) {
+                result.setSuccess(true);
+                result.setMessage('Success');
+                result.setData(res);
+                callback(null, result);
+            } else {
+                result.setSuccess(false);
+                result.setData(null);
+                result.setMessage('User can not found!');
+                callback(null, result);
+            }
+        }
+    });
+};
+
 const checkUsername = function (db, username, callback) {
     let result = new ResultInfo(false, null, '');
 
