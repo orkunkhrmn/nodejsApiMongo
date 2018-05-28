@@ -9,7 +9,7 @@ var DatabaseName = helper.GetDatabaseName();
 var url = helper.GetURL();
 
 module.exports.Register = function (db, UserInfo, callback) {
-    let result = new ResultInfo(false, null, '');
+    let result = new ResultInfo(false, null, '', 0);
 
     checkUsername(db, UserInfo.username, function (err_q, result_q) {
         if (err_q) {
@@ -36,15 +36,15 @@ module.exports.Register = function (db, UserInfo, callback) {
     });
 };
 
-module.exports.Login= function(db, UserInfo, callback){
-    let result = new ResultInfo(false, null, '');
+module.exports.Login = function (db, UserInfo, callback) {
+    let result = new ResultInfo(false, null, '', 0);
 
-    db.collection(tableName).findOne({username : UserInfo.username, password : UserInfo.password},function(err, res){
-        if(err){
+    db.collection(tableName).findOne({ username: UserInfo.username, password: UserInfo.password }, function (err, res) {
+        if (err) {
             result.setMessage('Query error!');
             callback(err, result);
         }
-        else{
+        else {
             if (res != '' && res != null) {
                 result.setSuccess(true);
                 result.setMessage('Success');
@@ -56,6 +56,46 @@ module.exports.Login= function(db, UserInfo, callback){
                 result.setMessage('User can not found!');
                 callback(null, result);
             }
+        }
+    });
+};
+
+module.exports.GetUsers = function (db, page_number, record_for_page, request, response, callback) {
+    let result = new ResultInfo(false, null, '', 0);
+
+    record_for_page = record_for_page * 1;
+    let skips = record_for_page * (page_number - 1);
+
+    let total_record = 0;
+
+    db.collection(tableName).find({}).count(function (err_c, res_c) {
+        if (err_c) {
+            result.setData(null);
+            result.setMessage('Query error!');
+            result.setSuccess(false);
+
+            callback(err_c, result);
+        }
+        else {
+            total_record = res_c;
+
+            db.collection(tableName).find({}).skip(skips).limit(record_for_page).toArray(function (err_q, res_q) {
+                if (err_q) {
+                    result.setData(null);
+                    result.setMessage('Query error!');
+                    result.setSuccess(false);
+
+                    callback(err_q, result);
+                }
+                else {
+                    result.setSuccess(true);
+                    result.setMessage('Success');
+                    result.setData(res_q);
+                    result.setTotalRecord(total_record);
+
+                    callback(null, result);
+                }
+            });
         }
     });
 };

@@ -1,9 +1,10 @@
 'user strict'
 class ResultInfo {
-    constructor(success, data, message) {
+    constructor(success, data, message, total_record) {
         this.success = success;
         this.data = data;
         this.message = message;
+        this.total_record = total_record;
     }
     getSuccess() {
         return this.success;
@@ -13,6 +14,10 @@ class ResultInfo {
     }
     getMessage() {
         return this.message;
+    }
+    
+    getTotalRecord(){
+        return this.total_record;
     }
 
     setSuccess(success){
@@ -25,6 +30,10 @@ class ResultInfo {
 
     setData(data){
         this.data = data;
+    }
+
+    setTotalRecord(total_record){
+        this.total_record = total_record;
     }
 }
 
