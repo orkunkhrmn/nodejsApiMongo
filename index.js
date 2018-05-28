@@ -69,16 +69,22 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
             response.status(400).send("Please send user information!");
         }
         else {
-            let userInfo = request.body;
+            if(!request.body.username || !request.body.password){
+                let resultInfo = new ResultInfo(false, null, 'Please send user information!', 0);
+                response.status(400).send(resultInfo);
+            }
+            else{
+                let userInfo = new UserInfo(request.body.username, '', request.body.password);
 
-            userClass.Login(dbo, userInfo, function (err, result) {
-                if (err) {
-                    response.status(500).send(result);
-                }
-                else {
-                    response.status(201).send(result);
-                }
-            })
+                userClass.Login(dbo, userInfo, function (err, result) {
+                    if (err) {
+                        response.status(500).send(result);
+                    }
+                    else {
+                        response.status(201).send(result);
+                    }
+                });
+            }
         }
     });
 
