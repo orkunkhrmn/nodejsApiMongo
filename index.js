@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var mongoClient = require('mongodb').MongoClient;
 
 var userClass = require('./db_user_class');
+var guideClass = require('./db_guide_class');
 var helper = require('./helper');
 var UserInfo = require('./models/userInfo');
 var ResultInfo = require('./models/resultInfo');
@@ -101,6 +102,27 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
             let record_for_page = request.query["record_for_page"];
 
             userClass.GetUsers(dbo, page_number, record_for_page, request, response, function (err, res) {
+                if (err) {
+                    response.status(500).send(res);
+                }
+                else {
+                    response.status(201).send(res);
+                }
+            });
+        }
+    });
+
+    app.get('/api/guides', function(request, response, next){
+        next()
+    }, function(request, response, next){
+        if (!request.query["page_number"] || !request.query["record_for_page"]) {
+            response.status(400).send("Parameter is missing!");
+        }
+        else {
+            let page_number = request.query["page_number"];
+            let record_for_page = request.query["record_for_page"];
+
+            guideClass.GetUsersGuides(dbo, page_number, record_for_page, request, response, function (err, res) {
                 if (err) {
                     response.status(500).send(res);
                 }
