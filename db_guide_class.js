@@ -50,3 +50,20 @@ module.exports.GetUsersGuides = function (db, user_id, page_number, record_for_p
     })
 
 }
+
+module.exports.InsertGuide = function (db, guideInfo, request, response, callback) {
+    let result = new ResultInfo(false, null, '', 0);
+
+    db.collection(tableName).insertOne(guideInfo, function (err, res) {
+        if (err) {
+            result.setMessage('Insert error!');
+            callback(err, result)
+        }
+        else {
+            result.setSuccess(true);
+            result.setMessage('Success!');
+
+            callback(null, result);
+        }
+    })
+}

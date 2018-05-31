@@ -70,11 +70,11 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
             response.status(400).send("Please send user information!");
         }
         else {
-            if(!request.body.username || !request.body.password){
+            if (!request.body.username || !request.body.password) {
                 let resultInfo = new ResultInfo(false, null, 'Please send user information!', 0);
                 response.status(400).send(resultInfo);
             }
-            else{
+            else {
                 let userInfo = new UserInfo(request.body.username, '', request.body.password);
 
                 userClass.Login(dbo, userInfo, function (err, result) {
@@ -112,9 +112,9 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
         }
     });
 
-    app.get('/api/guides', function(request, response, next){
+    app.get('/api/guide', function (request, response, next) {
         next()
-    }, function(request, response, next){
+    }, function (request, response, next) {
         if (!request.query["page_number"] || !request.query["record_for_page"]) {
             response.status(400).send("Parameter is missing!");
         }
@@ -130,6 +130,32 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
                     response.status(201).send(res);
                 }
             });
+        }
+    });
+
+    app.post('/api/guide', function (request, response, next) {
+        next()
+    }, function (request, response, next) {
+        if (!request.body) {
+            response.status(400).send("Please send user information!");
+        }
+        else {
+            if (!request.body.fullname || !request.body.address || !request.body.user_id) {
+                let resultInfo = new ResultInfo(false, null, 'Please send user information!', 0);
+                response.status(400).send(resultInfo);
+            }
+            else {
+                let guideInfo = new GuideInfo(request.body.fullname, request.body.address, request.body.user_id);
+
+                guideClass.InsertGuide(dbo, guideInfo, function (err, result) {
+                    if (err) {
+                        response.status(500).send(result);
+                    }
+                    else {
+                        response.status(201).send(result);
+                    }
+                });
+            }
         }
     });
 
