@@ -10,6 +10,7 @@ var guideClass = require('./db_guide_class');
 var helper = require('./helper');
 var UserInfo = require('./models/userInfo');
 var ResultInfo = require('./models/resultInfo');
+var GuideInfo = require('./models/guideInfo');
 
 var mongoURL = helper.GetURL();
 var databaseName = helper.GetDatabaseName();
@@ -29,7 +30,6 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
     var dbo = db.db(databaseName);
 
     app.post('/api/register', function (request, response, next) {
-        //console.log('register');
         next()
     }, function (request, response, next) {
 
@@ -37,9 +37,6 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
             response.status(400).send("Please send user information!");
         }
         else {
-
-            //console.log(request.body);
-
             if (!request.body.username || !request.body.fullname || !request.body.password) {
 
                 let resultInfo = new ResultInfo(false, null, 'Please send user information!', 0);
@@ -62,7 +59,6 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
     });
 
     app.post('/api/login', function (request, response, next) {
-        //console.log('login');
         next()
     }, function (request, response, next) {
 
@@ -90,7 +86,6 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
     });
 
     app.get('/api/users', function (request, response, next) {
-        //console.log('users');
         next()
     }, function (request, response, next) {
 
@@ -115,14 +110,14 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
     app.get('/api/guide', function (request, response, next) {
         next()
     }, function (request, response, next) {
-        if (!request.query["page_number"] || !request.query["record_for_page"]) {
+        if (!request.query["page_number"] || !request.query["record_for_page"] || !request.query["user_id"]) {
             response.status(400).send("Parameter is missing!");
         }
         else {
             let page_number = request.query["page_number"];
             let record_for_page = request.query["record_for_page"];
-
-            guideClass.GetUsersGuides(dbo, page_number, record_for_page, request, response, function (err, res) {
+            let user_id = request.query["user_id"];
+            guideClass.GetUsersGuides(dbo, user_id, page_number, record_for_page, request, response, function (err, res) {
                 if (err) {
                     response.status(500).send(res);
                 }
@@ -145,9 +140,8 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
                 response.status(400).send(resultInfo);
             }
             else {
-                let guideInfo = new GuideInfo(request.body.fullname, request.body.address, request.body.user_id);
-
-                guideClass.InsertGuide(dbo, guideInfo, function (err, result) {
+                let guideInfo = new GuideInfo('', request.body.fullname, request.body.address, request.body.user_id);
+                guideClass.InsertGuide(dbo, guideInfo, request, response, function (err, result) {
                     if (err) {
                         response.status(500).send(result);
                     }
@@ -156,6 +150,69 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
                     }
                 });
             }
+        }
+    });
+
+    app.put('/api/guide/:id', function (request, response, next) {
+        next()
+    }, function (request, response, next) {
+        if (!request.params['id']) {
+            response.status(400).send("Missinng parameter!");
+        }
+        else {
+            if (!request.body.fullname || !request.body.address || !request.body.user_id) {
+                let resultInfo = new ResultInfo(false, null, 'Please send user information!', 0);
+                response.status(400).send(resultInfo);
+            } else {
+                let guideInfo = new GuideInfo(request.body._id, request.body.fullname, request.body.address, request.body.user_id);
+                guideClass.UpdateGuide(dbo, guideInfo, request, response, function (err, result) {
+                    if (err) {
+                        response.status(500).send(result);
+                    }
+                    else {
+                        response.status(201).send(result);
+                    }
+                });
+            }
+        }
+    })
+
+    app.get('/api/guide/:id', function (request, response, next) {
+        next()
+    }, function (request, response, next) {
+        if (!request.params["id"]) {
+            response.status(400).send("Missinng parameter!");
+        }
+        else {
+            let id = request.params["id"];
+
+            guideClass.GetGuideByID(dbo, id, request, response, function (err, result) {
+                if (err) {
+                    response.status(500).send(result);
+                }
+                else {
+                    response.status(201).send(result);
+                }
+            });
+        }
+    });
+
+    app.delete('/api/guide/:id', function (request, response, next) {
+        next()
+    }, function (request, response, next) {
+        if (!request.params["id"]) {
+            response.status(400).send("Missinng parameter!");
+        }
+        else {
+            let id = request.params["id"];
+            guideClass.DeleteGuideByID(dbo, id, request, response, function (err, result) {
+                if (err) {
+                    response.status(500).send(result);
+                }
+                else {
+                    response.status(201).send(result);
+                }
+            });
         }
     });
 
