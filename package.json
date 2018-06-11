@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "express": "^4.16.3",
     "fs": "0.0.1-security",
     "http": "0.0.0",
-    "mongodb": "^3.1.0-beta4"
+    "mongodb": "^3.1.0-beta4",
+    "nodemon": "^1.17.5"
   }
 }

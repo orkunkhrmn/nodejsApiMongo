@@ -63,7 +63,7 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
     }, function (request, response, next) {
 
         if (!request.body) {
-            response.status(400).send("Please send user information!");
+            response.status(400).send("Please send user information!"); 
         }
         else {
             if (!request.body.username || !request.body.password) {
@@ -192,7 +192,7 @@ mongoClient.connect(mongoURL, { useNewUrlParser: true }, function (err, db) {
                 }
                 else {
                     response.status(201).send(result);
-                }
+                } 
             });
         }
     });

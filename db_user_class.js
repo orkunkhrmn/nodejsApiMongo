@@ -16,7 +16,7 @@ module.exports.Register = function (db, UserInfo, callback) {
             callback(err_q, result_q);
         }
         else {
-            if (result_q.getSuccess() == false) {
+            if (result_q.getSuccess() == false) { 
                 callback(err_q, result_q);
             }
             else {
